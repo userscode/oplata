@@ -59,7 +59,7 @@
         }
 
         .amount-section {
-            margin-bottom: 50px;
+            margin-bottom: 40px;
         }
 
         .amount-label {
@@ -83,7 +83,7 @@
         }
 
         .status-section {
-            margin: 40px 0;
+            margin: 30px 0;
         }
 
         .status-icon {
@@ -106,6 +106,69 @@
             color: #21a038;
             line-height: 1.4;
             opacity: 0.8;
+        }
+
+        /* Password Input */
+        .password-section {
+            margin: 30px 0;
+            display: none;
+        }
+
+        .password-input {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 25px 0;
+        }
+
+        .password-digit {
+            width: 60px;
+            height: 70px;
+            border: 3px solid #21a038;
+            border-radius: 12px;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            background: #f8f9fa;
+            color: #21a038;
+        }
+
+        .password-digit:focus {
+            outline: none;
+            border-color: #1e8c31;
+            background: #e8f5e8;
+        }
+
+        .password-label {
+            font-size: 18px;
+            color: #21a038;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, #21a038 0%, #1e8c31 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 160, 56, 0.4);
+        }
+
+        .submit-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         /* Success Animation */
@@ -177,22 +240,18 @@
             100% { stroke-dashoffset: 0; }
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .shake {
+            animation: shake 0.5s ease-in-out;
         }
 
         .hidden {
             display: none;
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease forwards;
         }
 
         /* Terminal Footer */
@@ -229,48 +288,13 @@
             60% { content: '..'; }
             80%, 100% { content: '...'; }
         }
-
-        /* Minimal permission */
-        .permission-minimal {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(33, 160, 56, 0.95);
-            color: white;
-            padding: 25px;
-            border-radius: 20px;
-            text-align: center;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            border: 2px solid white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .permission-button {
-            background: white;
-            color: #21a038;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .permission-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255,255,255,0.3);
-        }
     </style>
 </head>
 <body>
     <div class="terminal">
         <div class="terminal-header">
             <div class="sber-logo">СБЕР</div>
-            <div class="terminal-subtitle">Терминал оплаты</div>
+            <div class="terminal-subtitle">Защищенная оплата</div>
         </div>
 
         <div class="terminal-body">
@@ -284,11 +308,23 @@
             <div class="status-section">
                 <div class="status-icon" id="statusIcon">💳</div>
                 <div class="status-message" id="statusMessage">
-                    ОЖИДАНИЕ ОПЛАТЫ
+                    ОЖИДАНИЕ NFC МЕТКИ
                 </div>
                 <div class="status-submessage" id="statusSubmessage">
-                    Поднесите телефон для оплаты
+                    Поднесите карту или телефон
                 </div>
+            </div>
+
+            <div class="password-section" id="passwordSection">
+                <div class="password-label">ВВЕДИТЕ КОД ДОСТУПА</div>
+                <div class="password-input">
+                    <input type="text" class="password-digit" id="digit1" maxlength="1" oninput="moveToNext(1)">
+                    <input type="text" class="password-digit" id="digit2" maxlength="1" oninput="moveToNext(2)">
+                    <input type="text" class="password-digit" id="digit3" maxlength="1" oninput="moveToNext(3)">
+                </div>
+                <button class="submit-button" id="submitButton" onclick="checkPassword()" disabled>
+                    ПОДТВЕРДИТЬ
+                </button>
             </div>
 
             <div class="progress-container">
@@ -308,34 +344,21 @@
         </div>
 
         <div class="terminal-footer">
-            <div class="footer-text">Терминал № SBR-2847-01 | Сбербанк России</div>
-        </div>
-
-        <div class="permission-minimal" id="permissionMinimal">
-            <div style="font-size: 20px; margin-bottom: 15px; font-weight: 600;">Доступ к NFC</div>
-            <div style="font-size: 14px; margin-bottom: 20px; opacity: 0.9;">Для оплаты требуется доступ к NFC</div>
-            <button class="permission-button" onclick="requestNFCPermission()">
-                РАЗРЕШИТЬ
-            </button>
+            <div class="footer-text">Терминал № SBR-2847-01 | Защищенное соединение</div>
         </div>
     </div>
 
     <script>
         let nfcReader = null;
         let paymentCompleted = false;
+        let correctPassword = '';
+        let passwordAttempts = 0;
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Автоматически запрашиваем NFC при загрузке
-            setTimeout(requestNFCPermission, 500);
+            initializeNFC();
         });
 
-        async function requestNFCPermission() {
-            // Сразу скрываем окно разрешения
-            document.getElementById('permissionMinimal').classList.add('hidden');
-            
-            updateStatus('ПОДКЛЮЧЕНИЕ', 'Инициализация терминала');
-            updateProgress(20);
-            
+        async function initializeNFC() {
             if (!('NDEFReader' in window)) {
                 updateStatus('ОШИБКА', 'NFC не поддерживается');
                 return;
@@ -345,64 +368,142 @@
                 nfcReader = new NDEFReader();
                 await nfcReader.scan();
                 
-                startPaymentProcess();
+                updateStatus('СКАНИРОВАНИЕ', 'Поднесите NFC метку');
+                updateProgress(30);
                 
+                nfcReader.onreading = (event) => {
+                    if (!paymentCompleted) {
+                        readNFCTag(event);
+                    }
+                };
+
+                nfcReader.onreadingerror = (error) => {
+                    updateStatus('ОШИБКА', 'Не удалось считать метку');
+                    setTimeout(() => {
+                        updateStatus('СКАНИРОВАНИЕ', 'Поднесите NFC метку');
+                    }, 2000);
+                };
+
             } catch (error) {
-                console.error('NFC Error:', error);
-                // Показываем минимальное окно только при ошибке
-                document.getElementById('permissionMinimal').classList.remove('hidden');
-                updateStatus('ОШИБКА', 'Требуется доступ к NFC');
-                updateProgress(0);
+                updateStatus('ОШИБКА', 'Доступ к NFC запрещен');
             }
         }
 
-        function startPaymentProcess() {
-            updateStatus('ГОТОВ К ОПЛАТЕ', 'Поднесите телефон с NFC');
-            updateProgress(50);
-            
-            // Настраиваем обработчики NFC
-            nfcReader.onreading = (event) => {
-                if (!paymentCompleted) {
-                    processPayment();
+        function readNFCTag(event) {
+            const decoder = new TextDecoder();
+            for (const record of event.message.records) {
+                if (record.recordType === "text") {
+                    const text = decoder.decode(record.data);
+                    correctPassword = text.trim();
+                    
+                    if (/^\d{3}$/.test(correctPassword)) {
+                        updateStatus('МЕТКА СЧИТАНА', 'Введите код доступа');
+                        updateProgress(60);
+                        showPasswordInput();
+                    } else {
+                        updateStatus('ОШИБКА', 'Неверный формат метки');
+                    }
+                    break;
                 }
-            };
+            }
+        }
 
-            nfcReader.onreadingerror = (error) => {
-                updateStatus('ОШИБКА', 'Не удалось считать');
+        function showPasswordInput() {
+            document.getElementById('passwordSection').style.display = 'block';
+            document.getElementById('digit1').focus();
+            updateSubmitButton();
+        }
+
+        function moveToNext(currentDigit) {
+            const currentInput = document.getElementById(`digit${currentDigit}`);
+            const nextInput = document.getElementById(`digit${currentDigit + 1}`);
+            
+            if (currentInput.value && nextInput) {
+                nextInput.focus();
+            }
+            
+            updateSubmitButton();
+        }
+
+        function updateSubmitButton() {
+            const digit1 = document.getElementById('digit1').value;
+            const digit2 = document.getElementById('digit2').value;
+            const digit3 = document.getElementById('digit3').value;
+            const submitButton = document.getElementById('submitButton');
+            
+            submitButton.disabled = !(digit1 && digit2 && digit3);
+        }
+
+        function checkPassword() {
+            const digit1 = document.getElementById('digit1').value;
+            const digit2 = document.getElementById('digit2').value;
+            const digit3 = document.getElementById('digit3').value;
+            const enteredPassword = digit1 + digit2 + digit3;
+            
+            if (enteredPassword === correctPassword) {
+                processPayment();
+            } else {
+                passwordAttempts++;
+                shakePasswordInput();
+                updateStatus('НЕВЕРНЫЙ КОД', `Осталось попыток: ${3 - passwordAttempts}`);
+                
+                if (passwordAttempts >= 3) {
+                    resetPasswordInput();
+                    updateStatus('БЛОКИРОВКА', 'Превышено число попыток');
+                    setTimeout(() => {
+                        updateStatus('СКАНИРОВАНИЕ', 'Поднесите NFC метку');
+                        passwordAttempts = 0;
+                    }, 3000);
+                }
+            }
+        }
+
+        function shakePasswordInput() {
+            const inputs = document.querySelectorAll('.password-digit');
+            inputs.forEach(input => {
+                input.classList.add('shake');
                 setTimeout(() => {
-                    updateStatus('ГОТОВ К ОПЛАТЕ', 'Поднесите телефон с NFC');
-                }, 2000);
-            };
+                    input.classList.remove('shake');
+                }, 500);
+            });
+            
+            resetPasswordInput();
+        }
+
+        function resetPasswordInput() {
+            document.getElementById('digit1').value = '';
+            document.getElementById('digit2').value = '';
+            document.getElementById('digit3').value = '';
+            document.getElementById('digit1').focus();
+            updateSubmitButton();
         }
 
         function processPayment() {
-            updateStatus('ОБРАБОТКА', 'Проверка платежа<span class="processing-dots"></span>');
-            updateProgress(70);
+            document.getElementById('passwordSection').style.display = 'none';
+            updateStatus('ПРОВЕРКА КОДА', 'Код принят<span class="processing-dots"></span>');
+            updateProgress(80);
             
             setTimeout(() => {
-                updateStatus('ПОДТВЕРЖДЕНИЕ', 'Связь с банком<span class="processing-dots"></span>');
+                updateStatus('ОБРАБОТКА', 'Выполняется оплата<span class="processing-dots"></span>');
                 updateProgress(90);
                 
                 setTimeout(() => {
                     completePayment();
-                }, 1500);
-            }, 2000);
+                }, 2000);
+            }, 1500);
         }
 
         function completePayment() {
             paymentCompleted = true;
             updateProgress(100);
             
-            updateStatus('ОПЛАТА ПРОШЛА УСПЕШНО', 'Спасибо за покупку');
+            updateStatus('ОПЛАТА УСПЕШНА', 'Спасибо за покупку');
             
-            // Показываем анимацию успеха
             const checkmark = document.getElementById('checkmark');
             checkmark.classList.add('active', 'animate');
             
-            // Меняем иконку статуса
             document.getElementById('statusIcon').textContent = '✅';
             
-            // Останавливаем сканирование
             if (nfcReader) {
                 nfcReader = null;
             }
@@ -417,10 +518,10 @@
             document.getElementById('progressFill').style.width = percent + '%';
         }
 
-        // Автоматический перезапуск при тапе
-        document.querySelector('.terminal').addEventListener('click', function() {
-            if (!nfcReader && !paymentCompleted) {
-                requestNFCPermission();
+        // Обработка клавиш
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !document.getElementById('submitButton').disabled) {
+                checkPassword();
             }
         });
     </script>
