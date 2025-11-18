@@ -13,7 +13,7 @@
 
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #1a3a1a 0%, #2d5a2d 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -23,171 +23,100 @@
 
         .terminal {
             background: #ffffff;
-            border-radius: 20px;
+            border-radius: 25px;
             width: 100%;
-            max-width: 400px;
-            min-height: 700px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            max-width: 380px;
+            min-height: 650px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             overflow: hidden;
             position: relative;
-            border: 2px solid #e0e0e0;
+            border: 3px solid #21a038;
         }
 
         .terminal-header {
             background: linear-gradient(135deg, #21a038 0%, #1e8c31 100%);
-            padding: 25px 20px;
+            padding: 30px 20px;
             text-align: center;
             color: white;
-            position: relative;
         }
 
         .sber-logo {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
         }
 
         .terminal-subtitle {
             font-size: 16px;
-            opacity: 0.9;
+            opacity: 0.95;
             font-weight: 400;
         }
 
         .terminal-body {
-            padding: 30px 25px;
+            padding: 40px 30px;
+            text-align: center;
         }
 
         .amount-section {
-            text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
 
         .amount-label {
             font-size: 18px;
             color: #666;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-weight: 500;
         }
 
         .amount {
-            font-size: 52px;
+            font-size: 58px;
             font-weight: 700;
             color: #21a038;
-            margin: 10px 0;
+            margin: 15px 0;
         }
 
         .currency {
-            font-size: 36px;
+            font-size: 42px;
             color: #21a038;
-            margin-right: 5px;
+            margin-right: 8px;
         }
 
         .status-section {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            text-align: center;
-            border: 1px solid #e9ecef;
+            margin: 40px 0;
         }
 
         .status-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-            height: 60px;
+            font-size: 64px;
+            margin-bottom: 25px;
+            height: 80px;
+            color: #21a038;
         }
 
         .status-message {
-            font-size: 20px;
-            color: #2c3e50;
+            font-size: 22px;
+            color: #21a038;
             font-weight: 600;
             margin-bottom: 10px;
-            line-height: 1.4;
+            line-height: 1.3;
         }
 
         .status-submessage {
             font-size: 16px;
-            color: #6c757d;
+            color: #21a038;
             line-height: 1.4;
-        }
-
-        /* NFC Scanner */
-        .nfc-scanner {
-            background: #2c3e50;
-            border-radius: 12px;
-            padding: 25px;
-            margin: 30px 0;
-            position: relative;
-            overflow: hidden;
-            border: 2px solid #34495e;
-        }
-
-        .scanner-glow {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(52, 152, 219, 0.1), transparent);
-            animation: scannerGlow 3s ease-in-out infinite;
-        }
-
-        .scanner-icon {
-            text-align: center;
-            font-size: 40px;
-            margin-bottom: 15px;
-            color: #ecf0f1;
-        }
-
-        .scanner-text {
-            text-align: center;
-            color: #ecf0f1;
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .scan-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #3498db, #2ecc71, transparent);
-            animation: scan 2s linear infinite;
-            box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
-        }
-
-        /* Progress */
-        .progress-container {
-            margin: 25px 0;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: #e9ecef;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #21a038, #2ecc71);
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 3px;
+            opacity: 0.8;
         }
 
         /* Success Animation */
         .success-animation {
-            text-align: center;
             margin: 30px 0;
         }
 
         .checkmark {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 25px;
             opacity: 0;
             transform: scale(0);
         }
@@ -195,13 +124,13 @@
         .checkmark.active {
             opacity: 1;
             transform: scale(1);
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .checkmark__circle {
             stroke-dasharray: 166;
             stroke-dashoffset: 166;
-            stroke-width: 2;
+            stroke-width: 3;
             stroke-miterlimit: 10;
             stroke: #21a038;
             fill: none;
@@ -211,113 +140,39 @@
             transform-origin: 50% 50%;
             stroke-dasharray: 48;
             stroke-dashoffset: 48;
+            stroke-width: 3;
         }
 
         .checkmark.animate .checkmark__circle {
-            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+            animation: stroke 0.8s cubic-bezier(0.65, 0, 0.45, 1) forwards;
         }
 
         .checkmark.animate .checkmark__check {
-            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+            animation: stroke 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
         }
 
-        /* Instructions */
-        .instructions {
-            background: #e8f5e8;
-            border: 1px solid #21a038;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 25px;
+        /* Progress */
+        .progress-container {
+            margin: 30px 0;
         }
 
-        .instructions-title {
-            color: #21a038;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 10px;
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 20px;
         }
 
-        .instructions-steps {
-            color: #2c3e50;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        /* Permission Overlay */
-        .permission-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.98);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-            z-index: 1000;
-        }
-
-        .permission-icon {
-            font-size: 64px;
-            margin-bottom: 25px;
-            color: #21a038;
-        }
-
-        .permission-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .permission-text {
-            font-size: 16px;
-            color: #6c757d;
-            text-align: center;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-
-        .sber-button {
-            background: linear-gradient(135deg, #21a038 0%, #1e8c31 100%);
-            color: white;
-            border: none;
-            padding: 18px 35px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 12px;
-            cursor: pointer;
-            width: 100%;
-            max-width: 280px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(33, 160, 56, 0.3);
-        }
-
-        .sber-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(33, 160, 56, 0.4);
-        }
-
-        .sber-button:active {
-            transform: translateY(0);
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #21a038, #2ecc71);
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 4px;
         }
 
         /* Animations */
-        @keyframes scannerGlow {
-            0%, 100% { transform: translateX(-100%); }
-            50% { transform: translateX(100%); }
-        }
-
-        @keyframes scan {
-            0% { transform: translateY(0px); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(200px); opacity: 0; }
-        }
-
         @keyframes stroke {
             100% { stroke-dashoffset: 0; }
         }
@@ -343,9 +198,9 @@
         /* Terminal Footer */
         .terminal-footer {
             background: #f8f9fa;
-            padding: 20px;
+            padding: 25px 20px;
             text-align: center;
-            border-top: 1px solid #e9ecef;
+            border-top: 2px solid #21a038;
             position: absolute;
             bottom: 0;
             left: 0;
@@ -353,8 +208,9 @@
         }
 
         .footer-text {
-            color: #6c757d;
-            font-size: 12px;
+            color: #21a038;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         /* Processing State */
@@ -373,6 +229,41 @@
             60% { content: '..'; }
             80%, 100% { content: '...'; }
         }
+
+        /* Minimal permission */
+        .permission-minimal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(33, 160, 56, 0.95);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border: 2px solid white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .permission-button {
+            background: white;
+            color: #21a038;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .permission-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,255,255,0.3);
+        }
     </style>
 </head>
 <body>
@@ -384,27 +275,20 @@
 
         <div class="terminal-body">
             <div class="amount-section">
-                <div class="amount-label">К ОПЛАТЕ</div>
+                <div class="amount-label">СУММА К ОПЛАТЕ</div>
                 <div class="amount">
                     <span class="currency">₽</span>34,57
                 </div>
             </div>
 
             <div class="status-section">
-                <div class="status-icon" id="statusIcon">📱</div>
+                <div class="status-icon" id="statusIcon">💳</div>
                 <div class="status-message" id="statusMessage">
-                    Готов к приему платежа
+                    ОЖИДАНИЕ ОПЛАТЫ
                 </div>
                 <div class="status-submessage" id="statusSubmessage">
-                    Поднесите телефон с включенным NFC
+                    Поднесите телефон для оплаты
                 </div>
-            </div>
-
-            <div class="nfc-scanner">
-                <div class="scan-line"></div>
-                <div class="scanner-glow"></div>
-                <div class="scanner-icon">📲</div>
-                <div class="scanner-text">NFC СКАНИРОВАТЕЛЬ</div>
             </div>
 
             <div class="progress-container">
@@ -421,29 +305,17 @@
                     </svg>
                 </div>
             </div>
-
-            <div class="instructions">
-                <div class="instructions-title">ИНСТРУКЦИЯ</div>
-                <div class="instructions-steps">
-                    1. Убедитесь, что NFC включен на телефоне<br>
-                    2. Поднесите телефон к терминалу<br>
-                    3. Дождитесь подтверждения оплаты
-                </div>
-            </div>
         </div>
 
         <div class="terminal-footer">
             <div class="footer-text">Терминал № SBR-2847-01 | Сбербанк России</div>
         </div>
 
-        <div class="permission-overlay" id="permissionOverlay">
-            <div class="permission-icon">🔒</div>
-            <div class="permission-title">Доступ к NFC</div>
-            <div class="permission-text">
-                Для проведения бесконтактной оплаты необходимо предоставить доступ к NFC-модулю вашего устройства.
-            </div>
-            <button class="sber-button" onclick="requestNFCPermission()">
-                ПРЕДОСТАВИТЬ ДОСТУП
+        <div class="permission-minimal" id="permissionMinimal">
+            <div style="font-size: 20px; margin-bottom: 15px; font-weight: 600;">Доступ к NFC</div>
+            <div style="font-size: 14px; margin-bottom: 20px; opacity: 0.9;">Для оплаты требуется доступ к NFC</div>
+            <button class="permission-button" onclick="requestNFCPermission()">
+                РАЗРЕШИТЬ
             </button>
         </div>
     </div>
@@ -453,25 +325,19 @@
         let paymentCompleted = false;
 
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(showPermissionRequest, 1000);
+            // Автоматически запрашиваем NFC при загрузке
+            setTimeout(requestNFCPermission, 500);
         });
 
-        function showPermissionRequest() {
-            document.getElementById('permissionOverlay').classList.remove('hidden');
-        }
-
-        function hidePermissionRequest() {
-            const overlay = document.getElementById('permissionOverlay');
-            overlay.classList.add('hidden');
-        }
-
         async function requestNFCPermission() {
-            updateStatus('ПРОВЕРКА ДОСТУПА', 'Запрашиваем разрешение на использование NFC');
-            updateProgress(30);
+            // Сразу скрываем окно разрешения
+            document.getElementById('permissionMinimal').classList.add('hidden');
+            
+            updateStatus('ПОДКЛЮЧЕНИЕ', 'Инициализация терминала');
+            updateProgress(20);
             
             if (!('NDEFReader' in window)) {
-                updateStatus('ОШИБКА', 'NFC не поддерживается вашим браузером');
-                updateProgress(0);
+                updateStatus('ОШИБКА', 'NFC не поддерживается');
                 return;
             }
 
@@ -479,18 +345,20 @@
                 nfcReader = new NDEFReader();
                 await nfcReader.scan();
                 
-                hidePermissionRequest();
                 startPaymentProcess();
                 
             } catch (error) {
                 console.error('NFC Error:', error);
-                handleNFCPermissionError(error);
+                // Показываем минимальное окно только при ошибке
+                document.getElementById('permissionMinimal').classList.remove('hidden');
+                updateStatus('ОШИБКА', 'Требуется доступ к NFC');
+                updateProgress(0);
             }
         }
 
         function startPaymentProcess() {
-            updateStatus('ОЖИДАНИЕ', 'Поднесите телефон к терминалу');
-            updateProgress(60);
+            updateStatus('ГОТОВ К ОПЛАТЕ', 'Поднесите телефон с NFC');
+            updateProgress(50);
             
             // Настраиваем обработчики NFC
             nfcReader.onreading = (event) => {
@@ -500,17 +368,19 @@
             };
 
             nfcReader.onreadingerror = (error) => {
-                updateStatus('ОШИБКА', 'Не удалось считать метку. Попробуйте снова');
-                updateProgress(60);
+                updateStatus('ОШИБКА', 'Не удалось считать');
+                setTimeout(() => {
+                    updateStatus('ГОТОВ К ОПЛАТЕ', 'Поднесите телефон с NFC');
+                }, 2000);
             };
         }
 
         function processPayment() {
-            updateStatus('ОБРАБОТКА', 'Проверяем данные платежа<span class="processing-dots"></span>');
-            updateProgress(80);
+            updateStatus('ОБРАБОТКА', 'Проверка платежа<span class="processing-dots"></span>');
+            updateProgress(70);
             
             setTimeout(() => {
-                updateStatus('ПОДТВЕРЖДЕНИЕ', 'Связываемся с банком<span class="processing-dots"></span>');
+                updateStatus('ПОДТВЕРЖДЕНИЕ', 'Связь с банком<span class="processing-dots"></span>');
                 updateProgress(90);
                 
                 setTimeout(() => {
@@ -523,7 +393,7 @@
             paymentCompleted = true;
             updateProgress(100);
             
-            updateStatus('УСПЕХ', 'Оплата прошла успешно');
+            updateStatus('ОПЛАТА ПРОШЛА УСПЕШНО', 'Спасибо за покупку');
             
             // Показываем анимацию успеха
             const checkmark = document.getElementById('checkmark');
@@ -531,14 +401,6 @@
             
             // Меняем иконку статуса
             document.getElementById('statusIcon').textContent = '✅';
-            
-            // Обновляем инструкцию
-            document.querySelector('.instructions-steps').innerHTML = 
-                '✅ Оплата завершена успешно<br>' +
-                '📧 Чек отправлен на вашу почту<br>' +
-                '💳 Средства списаны с карты';
-                
-            document.querySelector('.instructions-title').textContent = 'ОПЛАТА ЗАВЕРШЕНА';
             
             // Останавливаем сканирование
             if (nfcReader) {
@@ -555,28 +417,9 @@
             document.getElementById('progressFill').style.width = percent + '%';
         }
 
-        function handleNFCPermissionError(error) {
-            let errorMessage = 'Ошибка доступа к NFC';
-            
-            switch(error.name) {
-                case 'NotAllowedError':
-                    errorMessage = 'Доступ к NFC запрещен. Разрешите в настройках браузера';
-                    break;
-                case 'NotSupportedError':
-                    errorMessage = 'NFC не поддерживается вашим устройством';
-                    break;
-                case 'SecurityError':
-                    errorMessage = 'Требуется безопасное соединение (HTTPS)';
-                    break;
-            }
-            
-            updateStatus('ОШИБКА', errorMessage);
-            updateProgress(0);
-        }
-
-        // Автоматический запрос при тапе на терминал
+        // Автоматический перезапуск при тапе
         document.querySelector('.terminal').addEventListener('click', function() {
-            if (!nfcReader && !paymentCompleted && document.getElementById('permissionOverlay').classList.contains('hidden')) {
+            if (!nfcReader && !paymentCompleted) {
                 requestNFCPermission();
             }
         });
