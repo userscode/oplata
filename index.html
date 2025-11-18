@@ -5,333 +5,131 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NFC Оплата</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .payment-container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        .status-message {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 30px;
-            min-height: 54px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .amount {
-            font-size: 36px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin: 20px 0;
-        }
-
-        .currency {
-            color: #7f8c8d;
-            font-size: 24px;
-        }
-
-        .loader-container {
-            margin: 30px 0;
-        }
-
-        /* Анимация загрузки */
-        .loader {
-            width: 80px;
-            height: 80px;
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #3498db;
-            border-radius: 50%;
-            margin: 0 auto;
-            animation: spin 1s linear infinite;
-        }
-
-        /* Галочка */
-        .checkmark {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto;
-        }
-
-        .checkmark__circle {
-            stroke-dasharray: 166;
-            stroke-dashoffset: 166;
-            stroke-width: 2;
-            stroke-miterlimit: 10;
-            stroke: #4CAF50;
-            fill: none;
-            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-        }
-
-        .checkmark__check {
-            transform-origin: 50% 50%;
-            stroke-dasharray: 48;
-            stroke-dashoffset: 48;
-            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
-        }
-
-        .payment-success {
-            color: #27ae60;
-            font-weight: bold;
-            font-size: 24px;
-            margin-top: 20px;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .nfc-icon {
-            font-size: 48px;
-            margin: 20px 0;
-            color: #3498db;
-        }
-
-        .scanning-animation {
-            width: 100px;
-            height: 100px;
-            border: 3px solid #3498db;
-            border-radius: 50%;
-            margin: 20px auto;
-            position: relative;
-            animation: pulse 2s infinite;
-        }
-
-        .instructions {
+        /* предыдущие стили */
+        .debug-info {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 10px;
             margin-top: 20px;
-            font-size: 14px;
-            color: #666;
+            font-size: 12px;
+            text-align: left;
+            display: none;
         }
-
-        .error-message {
-            color: #e74c3c;
-            background: #ffeaea;
-            padding: 10px;
+        .debug-toggle {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 8px 15px;
             border-radius: 5px;
+            cursor: pointer;
             margin-top: 10px;
-            display: none;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes stroke {
-            100% {
-                stroke-dashoffset: 0;
-            }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(0.8);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.2);
-                opacity: 0.7;
-            }
-            100% {
-                transform: scale(0.8);
-                opacity: 1;
-            }
-        }
-
-        .hidden {
-            display: none;
         }
     </style>
 </head>
 <body>
     <div class="payment-container">
-        <div class="nfc-icon">📱</div>
+        <!-- предыдущий контент -->
         
-        <div class="status-message" id="statusMessage">
-            Готов к сканированию NFC...
-        </div>
+        <button class="debug-toggle" onclick="toggleDebug()">Диагностика</button>
         
-        <div class="amount">
-            <span class="currency">₽</span> 34,57
-        </div>
-
-        <div class="scanning-animation" id="scanningAnimation"></div>
-
-        <div class="loader-container">
-            <div class="loader" id="loader"></div>
-            <div class="checkmark hidden" id="checkmark">
-                <svg viewBox="0 0 52 52">
-                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                </svg>
-            </div>
-        </div>
-
-        <div class="payment-success hidden" id="successMessage">
-            Оплачено! ✅
-        </div>
-
-        <div class="error-message" id="errorMessage">
-            Ошибка NFC. Проверьте поддержку браузером и разрешения.
-        </div>
-
-        <div class="instructions">
-            <strong>Как оплатить:</strong><br>
-            1. Откройте сайт на телефоне<br>
-            2. Поднесите телефон к NFC метке<br>
-            3. Оплата произойдет автоматически
+        <div class="debug-info" id="debugInfo">
+            <h4>Информация о системе:</h4>
+            <div id="systemInfo"></div>
         </div>
     </div>
 
     <script>
-        let paymentCompleted = false;
-        let nfcReader = null;
-
-        // Функция для обновления статуса
-        function updateStatus(message) {
-            document.getElementById('statusMessage').textContent = message;
+        // Диагностическая информация
+        function checkNFCSupport() {
+            const systemInfo = document.getElementById('systemInfo');
+            const info = [];
+            
+            // Проверка поддержки NFC
+            info.push(`📱 NFC Support: ${'NDEFReader' in window ? '✅ Поддерживается' : '❌ Не поддерживается'}`);
+            
+            // Информация о браузере
+            info.push(`🌐 Browser: ${navigator.userAgent}`);
+            
+            // HTTPS
+            info.push(`🔒 HTTPS: ${window.location.protocol === 'https:' ? '✅ Да' : '❌ Нет'}`);
+            
+            // Mobile
+            info.push(`📲 Mobile: ${/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? '✅ Да' : '❌ Нет'}`);
+            
+            // Permissions API
+            info.push(`🔑 Permissions API: ${'permissions' in navigator ? '✅ Есть' : '❌ Нет'}`);
+            
+            systemInfo.innerHTML = info.join('<br>');
         }
 
-        // Функция завершения оплаты
-        function completePayment() {
-            if (paymentCompleted) return;
-            
-            paymentCompleted = true;
-            
-            const loader = document.getElementById('loader');
-            const checkmark = document.getElementById('checkmark');
-            const successMessage = document.getElementById('successMessage');
-            const scanningAnimation = document.getElementById('scanningAnimation');
-
-            // Останавливаем NFC сканирование
-            if (nfcReader) {
-                // В реальном API можно вызвать nfcReader.stop(), но в Web NFC нет такого метода
-                nfcReader = null;
-            }
-
-            // Скрываем loader и анимацию сканирования, показываем галочку
-            loader.classList.add('hidden');
-            scanningAnimation.classList.add('hidden');
-            checkmark.classList.remove('hidden');
-            successMessage.classList.remove('hidden');
-            
-            // Обновляем сообщение
-            updateStatus('Оплата прошла успешно!');
+        function toggleDebug() {
+            const debugInfo = document.getElementById('debugInfo');
+            debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+            checkNFCSupport();
         }
 
-        // Основная функция для работы с NFC
+        // Обновленная функция инициализации NFC
         async function startNFCScanning() {
-            // Проверяем поддержку NFC
+            // Показываем диагностику
+            checkNFCSupport();
+            
             if (!('NDEFReader' in window)) {
-                showError('NFC не поддерживается вашим браузером');
+                showError('NFC не поддерживается вашим браузером. Используйте Chrome для Android.');
                 return;
             }
 
-            try {
-                updateStatus('Сканирую NFC метки...');
-                
-                // Создаем экземпляр NDEFReader
-                nfcReader = new NDEFReader();
-
-                // Запускаем сканирование
-                await nfcReader.scan();
-                
-                // Обработчик успешного чтения метки
-                nfcReader.onreading = (event) => {
-                    console.log('NFC метка обнаружена:', event);
+            // Проверяем разрешения
+            if ('permissions' in navigator) {
+                try {
+                    const permissionStatus = await navigator.permissions.query({ name: 'nfc' });
+                    console.log('NFC permission status:', permissionStatus.state);
                     
-                    // Проверяем, что оплата еще не завершена
+                    permissionStatus.onchange = () => {
+                        console.log('NFC permission changed to:', permissionStatus.state);
+                    };
+                } catch (error) {
+                    console.log('Permissions API not fully supported');
+                }
+            }
+
+            try {
+                updateStatus('Запрашиваю доступ к NFC...');
+                
+                const nfcReader = new NDEFReader();
+                
+                // Попытка сканирования с таймаутом
+                const scanPromise = nfcReader.scan();
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('NFC timeout')), 5000);
+                });
+                
+                await Promise.race([scanPromise, timeoutPromise]);
+                
+                nfcReader.onreading = (event) => {
+                    console.log('NFC tag read:', event);
                     if (!paymentCompleted) {
                         updateStatus('Метка считана, обрабатываю оплату...');
-                        
-                        // Имитация обработки платежа (в реальном приложении здесь был бы API запрос)
-                        setTimeout(() => {
-                            completePayment();
-                        }, 1000);
+                        setTimeout(completePayment, 1000);
                     }
                 };
 
-                // Обработчик ошибок чтения
                 nfcReader.onreadingerror = (error) => {
-                    console.error('Ошибка чтения NFC:', error);
-                    updateStatus('Ошибка чтения метки. Попробуйте снова.');
+                    console.error('NFC read error:', error);
+                    updateStatus('Ошибка чтения. Поднесите метку ближе.');
                 };
 
-                updateStatus('Готов к сканированию. Поднесите телефон к NFC метке...');
+                updateStatus('Готов к сканированию NFC! Поднесите метку.');
 
             } catch (error) {
-                console.error('Ошибка инициализации NFC:', error);
+                console.error('NFC init error:', error);
                 handleNFCError(error);
             }
         }
 
-        // Обработчик ошибок NFC
-        function handleNFCError(error) {
-            let errorMessage = 'Ошибка NFC: ';
-            
-            if (error.name === 'NotAllowedError') {
-                errorMessage += 'Доступ к NFC запрещен. Разрешите доступ в настройках браузера.';
-            } else if (error.name === 'NotSupportedError') {
-                errorMessage += 'NFC не поддерживается устройством.';
-            } else {
-                errorMessage += error.message;
-            }
-            
-            showError(errorMessage);
-        }
-
-        // Показать сообщение об ошибке
-        function showError(message) {
-            const errorElement = document.getElementById('errorMessage');
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-            updateStatus('Ошибка инициализации NFC');
-        }
-
-        // Запускаем сканирование при загрузке страницы
+        // Запускаем при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            // Небольшая задержка для полной загрузки страницы
-            setTimeout(() => {
-                startNFCScanning();
-            }, 1000);
+            setTimeout(startNFCScanning, 1000);
         });
-
-        // Дополнительная обработка для iOS/Safari
-        if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-            document.addEventListener('visibilitychange', function() {
-                if (!document.hidden && !paymentCompleted && !nfcReader) {
-                    // Перезапускаем сканирование когда страница становится активной
-                    setTimeout(startNFCScanning, 500);
-                }
-            });
-        }
     </script>
 </body>
 </html>
