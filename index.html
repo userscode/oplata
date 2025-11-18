@@ -5,84 +5,376 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NFC Оплата</title>
     <style>
-        /* предыдущие стили */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .payment-container {
+            background: white;
+            border-radius: 25px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nfc-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .status-message {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .amount {
+            font-size: 42px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 25px 0;
+            animation: pulse 2s infinite;
+        }
+
+        .currency {
+            color: #7f8c8d;
+            font-size: 28px;
+        }
+
+        /* Анимация сканирования */
+        .scanning-area {
+            position: relative;
+            margin: 30px 0;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nfc-scanner {
+            width: 160px;
+            height: 160px;
+            border: 3px solid #3498db;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #3498db, transparent);
+            animation: scan 2s linear infinite;
+            box-shadow: 0 0 10px #3498db;
+        }
+
+        .scan-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 18px;
+            box-shadow: 0 0 30px rgba(52, 152, 219, 0.3);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        /* Анимация загрузки */
+        .loader-container {
+            margin: 25px 0;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.2);
+        }
+
+        /* Галочка успеха */
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.5s ease;
+        }
+
+        .checkmark.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .checkmark__circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #27ae60;
+            fill: none;
+        }
+
+        .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+        }
+
+        .checkmark.animate .checkmark__circle {
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .checkmark.animate .checkmark__check {
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+
+        /* Кнопка разрешения */
         .permission-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            backdrop-filter: blur(5px);
         }
-        
+
         .permission-box {
             background: white;
-            padding: 30px;
-            border-radius: 15px;
+            padding: 40px 30px;
+            border-radius: 25px;
             text-align: center;
-            max-width: 300px;
+            max-width: 350px;
             margin: 20px;
+            animation: slideUp 0.5s ease-out;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
-        
+
+        .permission-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
+        }
+
         .permission-button {
-            background: #3498db;
+            background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
             border: none;
-            padding: 15px 25px;
-            font-size: 16px;
-            border-radius: 25px;
+            padding: 18px 35px;
+            font-size: 18px;
+            border-radius: 50px;
             cursor: pointer;
-            margin: 10px;
+            margin: 15px 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+            font-weight: 600;
         }
-        
+
         .permission-button:hover {
-            background: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
         }
-        
+
+        .permission-button:active {
+            transform: translateY(-1px);
+        }
+
+        .payment-success {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 28px;
+            margin: 25px 0;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: successReveal 0.8s ease 0.5s forwards;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff0000;
+            opacity: 0;
+        }
+
+        /* Анимации */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(160px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(52, 152, 219, 0.6); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes stroke {
+            100% { stroke-dashoffset: 0; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes successReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(500px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
         .hidden {
             display: none;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
     <div class="payment-container">
         <div class="nfc-icon">📱</div>
+        
         <div class="status-message" id="statusMessage">
-            Для оплаты требуется доступ к NFC
+            Готов к оплате NFC
         </div>
+        
         <div class="amount">
             <span class="currency">₽</span> 34,57
         </div>
-        
-        <div class="permission-overlay" id="permissionOverlay">
-            <div class="permission-box">
-                <h3>Доступ к NFC</h3>
-                <p>Для сканирования NFC меток необходимо предоставить разрешение.</p>
-                <p>После нажатия "Разрешить" может появиться системное окно подтверждения.</p>
-                <button class="permission-button" onclick="requestNFCPermission()">
-                    📱 Разрешить NFC
-                </button>
-                <button class="permission-button" style="background: #95a5a6;" onclick="showManualInstructions()">
-                    Инструкция
-                </button>
+
+        <div class="scanning-area">
+            <div class="nfc-scanner hidden" id="nfcScanner">
+                <div class="scan-line"></div>
+                <div class="scan-glow"></div>
             </div>
         </div>
 
-        <div class="scanning-animation hidden" id="scanningAnimation"></div>
-        <div class="loader hidden" id="loader"></div>
-        
-        <div class="instructions hidden" id="manualInstructions">
-            <h4>Ручная настройка разрешений:</h4>
-            1. Откройте <strong>Настройки Chrome</strong><br>
-            2. Перейдите в <strong>Настройки сайта</strong><br>
-            3. Найдите этот сайт в списке<br>
-            4. Разрешите доступ к <strong>NFC</strong><br>
-            5. Обновите страницу<br>
-            <button onclick="hideManualInstructions()">Закрыть</button>
+        <div class="loader-container">
+            <div class="loader hidden" id="loader"></div>
+            <div class="checkmark" id="checkmark">
+                <svg viewBox="0 0 52 52">
+                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="payment-success hidden" id="successMessage">
+            ✅ Оплата прошла успешно!
+        </div>
+
+        <div class="instructions">
+            <strong>Просто поднесите телефон к NFC метке</strong><br>
+            Оплата произойдет автоматически
+        </div>
+    </div>
+
+    <div class="permission-overlay" id="permissionOverlay">
+        <div class="permission-box">
+            <div class="permission-icon">🔒</div>
+            <h3 style="margin-bottom: 15px; color: #2c3e50;">Доступ к NFC</h3>
+            <p style="margin-bottom: 25px; color: #666; line-height: 1.5;">
+                Для сканирования NFC меток необходимо предоставить разрешение.
+                После нажатия "Разрешить" может появиться системное окно подтверждения.
+            </p>
+            <button class="permission-button" onclick="requestNFCPermission()">
+                📱 Разрешить NFC
+            </button>
         </div>
     </div>
 
@@ -92,7 +384,7 @@
 
         // Показываем окно разрешения при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            showPermissionRequest();
+            setTimeout(showPermissionRequest, 500);
         });
 
         function showPermissionRequest() {
@@ -100,15 +392,12 @@
         }
 
         function hidePermissionRequest() {
-            document.getElementById('permissionOverlay').classList.add('hidden');
-        }
-
-        function showManualInstructions() {
-            document.getElementById('manualInstructions').classList.remove('hidden');
-        }
-
-        function hideManualInstructions() {
-            document.getElementById('manualInstructions').classList.add('hidden');
+            const overlay = document.getElementById('permissionOverlay');
+            overlay.classList.add('fade-out');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('fade-out');
+            }, 500);
         }
 
         // Основной запрос разрешения NFC
@@ -117,29 +406,16 @@
             
             if (!('NDEFReader' in window)) {
                 updateStatus('NFC не поддерживается вашим браузером');
-                showError('Используйте Chrome для Android версии 89+');
                 return;
             }
 
             try {
-                // Создаем экземпляр NFC Reader
                 nfcReader = new NDEFReader();
-                
-                // Пытаемся запустить сканирование - это запросит разрешение
-                updateStatus('Запрос разрешения...');
-                
                 await nfcReader.scan();
                 
-                // Если дошли сюда - разрешение получено
+                // Успешное получение доступа
                 hidePermissionRequest();
-                updateStatus('Доступ получен! Поднесите телефон к NFC метке...');
-                
-                // Показываем анимацию сканирования
-                document.getElementById('scanningAnimation').classList.remove('hidden');
-                document.getElementById('loader').classList.remove('hidden');
-                
-                // Настраиваем обработчики
-                setupNFCHandlers();
+                startScanningAnimation();
                 
             } catch (error) {
                 console.error('NFC Permission error:', error);
@@ -147,12 +423,25 @@
             }
         }
 
+        function startScanningAnimation() {
+            updateStatus('Сканирую... Поднесите телефон к метке');
+            
+            // Показываем анимацию сканирования
+            const scanner = document.getElementById('nfcScanner');
+            const loader = document.getElementById('loader');
+            
+            scanner.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            
+            // Настраиваем обработчики NFC
+            setupNFCHandlers();
+        }
+
         function setupNFCHandlers() {
             nfcReader.onreading = (event) => {
                 console.log('NFC tag detected:', event);
                 if (!paymentCompleted) {
-                    updateStatus('Оплата обрабатывается...');
-                    setTimeout(completePayment, 1500);
+                    processPayment();
                 }
             };
 
@@ -162,68 +451,89 @@
             };
         }
 
-        function handleNFCPermissionError(error) {
-            let errorMessage = '';
+        function processPayment() {
+            updateStatus('Обрабатываю оплату...');
             
-            switch(error.name) {
-                case 'NotAllowedError':
-                    errorMessage = 'Доступ к NFC запрещен. Разрешите в настройках Chrome.';
-                    showManualInstructions();
-                    break;
-                case 'NotSupportedError':
-                    errorMessage = 'NFC не поддерживается вашим устройством.';
-                    break;
-                case 'SecurityError':
-                    errorMessage = 'Требуется HTTPS соединение.';
-                    break;
-                default:
-                    errorMessage = `Ошибка: ${error.message}`;
-            }
+            // Скрываем сканер и лоадер
+            document.getElementById('nfcScanner').classList.add('hidden');
+            document.getElementById('loader').classList.add('hidden');
             
-            updateStatus(errorMessage);
-            showError(errorMessage);
+            // Показываем анимацию успеха
+            setTimeout(() => {
+                showSuccessAnimation();
+            }, 1000);
         }
 
-        function completePayment() {
+        function showSuccessAnimation() {
             paymentCompleted = true;
-            updateStatus('Оплачено успешно! ✅');
-            document.getElementById('loader').classList.add('hidden');
-            document.getElementById('scanningAnimation').classList.add('hidden');
             
-            if (nfcReader) {
-                // Останавливаем сканирование после успешной оплаты
-                nfcReader = null;
+            const checkmark = document.getElementById('checkmark');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Активируем анимацию галочки
+            checkmark.classList.add('active', 'animate');
+            successMessage.classList.remove('hidden');
+            
+            updateStatus('Оплата завершена!');
+            
+            // Создаем конфетти
+            createConfetti();
+        }
+
+        function createConfetti() {
+            const colors = ['#3498db', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'];
+            const container = document.querySelector('.payment-container');
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                confetti.style.animation = `confettiFall ${Math.random() * 3 + 2}s linear forwards`;
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                
+                container.appendChild(confetti);
+                
+                // Удаляем конфетти после анимации
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
             }
         }
 
         function updateStatus(message) {
-            document.getElementById('statusMessage').textContent = message;
-        }
-
-        function showError(message) {
-            // Можно добавить уведомление об ошибке
-            console.error(message);
-        }
-
-        // Дополнительные методы для обхода ограничений
-        function alternativeActivationMethods() {
-            // Метод 1: Активация по тапу на странице
-            document.addEventListener('click', function() {
-                if (!nfcReader && !paymentCompleted) {
-                    requestNFCPermission();
-                }
-            });
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.style.opacity = '0';
             
-            // Метод 2: Активация при фокусе на странице
-            document.addEventListener('touchstart', function() {
-                if (!nfcReader && !paymentCompleted) {
-                    setTimeout(requestNFCPermission, 100);
-                }
-            });
+            setTimeout(() => {
+                statusElement.textContent = message;
+                statusElement.style.opacity = '1';
+            }, 300);
         }
-        
-        // Запускаем альтернативные методы
-        alternativeActivationMethods();
+
+        function handleNFCPermissionError(error) {
+            let errorMessage = 'Ошибка доступа к NFC';
+            
+            switch(error.name) {
+                case 'NotAllowedError':
+                    errorMessage = 'Доступ к NFC запрещен';
+                    break;
+                case 'NotSupportedError':
+                    errorMessage = 'NFC не поддерживается';
+                    break;
+            }
+            
+            updateStatus(errorMessage);
+        }
+
+        // Альтернативная активация по клику на странице
+        document.addEventListener('click', function() {
+            if (!nfcReader && !paymentCompleted && document.getElementById('permissionOverlay').classList.contains('hidden')) {
+                requestNFCPermission();
+            }
+        });
     </script>
 </body>
 </html>
