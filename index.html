@@ -6,130 +6,224 @@
     <title>NFC Оплата</title>
     <style>
         /* предыдущие стили */
-        .debug-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            font-size: 12px;
-            text-align: left;
-            display: none;
+        .permission-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
-        .debug-toggle {
-            background: #95a5a6;
+        
+        .permission-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 300px;
+            margin: 20px;
+        }
+        
+        .permission-button {
+            background: #3498db;
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
+            padding: 15px 25px;
+            font-size: 16px;
+            border-radius: 25px;
             cursor: pointer;
-            margin-top: 10px;
+            margin: 10px;
+        }
+        
+        .permission-button:hover {
+            background: #2980b9;
+        }
+        
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="payment-container">
-        <!-- предыдущий контент -->
+        <div class="nfc-icon">📱</div>
+        <div class="status-message" id="statusMessage">
+            Для оплаты требуется доступ к NFC
+        </div>
+        <div class="amount">
+            <span class="currency">₽</span> 34,57
+        </div>
         
-        <button class="debug-toggle" onclick="toggleDebug()">Диагностика</button>
+        <div class="permission-overlay" id="permissionOverlay">
+            <div class="permission-box">
+                <h3>Доступ к NFC</h3>
+                <p>Для сканирования NFC меток необходимо предоставить разрешение.</p>
+                <p>После нажатия "Разрешить" может появиться системное окно подтверждения.</p>
+                <button class="permission-button" onclick="requestNFCPermission()">
+                    📱 Разрешить NFC
+                </button>
+                <button class="permission-button" style="background: #95a5a6;" onclick="showManualInstructions()">
+                    Инструкция
+                </button>
+            </div>
+        </div>
+
+        <div class="scanning-animation hidden" id="scanningAnimation"></div>
+        <div class="loader hidden" id="loader"></div>
         
-        <div class="debug-info" id="debugInfo">
-            <h4>Информация о системе:</h4>
-            <div id="systemInfo"></div>
+        <div class="instructions hidden" id="manualInstructions">
+            <h4>Ручная настройка разрешений:</h4>
+            1. Откройте <strong>Настройки Chrome</strong><br>
+            2. Перейдите в <strong>Настройки сайта</strong><br>
+            3. Найдите этот сайт в списке<br>
+            4. Разрешите доступ к <strong>NFC</strong><br>
+            5. Обновите страницу<br>
+            <button onclick="hideManualInstructions()">Закрыть</button>
         </div>
     </div>
 
     <script>
-        // Диагностическая информация
-        function checkNFCSupport() {
-            const systemInfo = document.getElementById('systemInfo');
-            const info = [];
-            
-            // Проверка поддержки NFC
-            info.push(`📱 NFC Support: ${'NDEFReader' in window ? '✅ Поддерживается' : '❌ Не поддерживается'}`);
-            
-            // Информация о браузере
-            info.push(`🌐 Browser: ${navigator.userAgent}`);
-            
-            // HTTPS
-            info.push(`🔒 HTTPS: ${window.location.protocol === 'https:' ? '✅ Да' : '❌ Нет'}`);
-            
-            // Mobile
-            info.push(`📲 Mobile: ${/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? '✅ Да' : '❌ Нет'}`);
-            
-            // Permissions API
-            info.push(`🔑 Permissions API: ${'permissions' in navigator ? '✅ Есть' : '❌ Нет'}`);
-            
-            systemInfo.innerHTML = info.join('<br>');
+        let nfcReader = null;
+        let paymentCompleted = false;
+
+        // Показываем окно разрешения при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            showPermissionRequest();
+        });
+
+        function showPermissionRequest() {
+            document.getElementById('permissionOverlay').classList.remove('hidden');
         }
 
-        function toggleDebug() {
-            const debugInfo = document.getElementById('debugInfo');
-            debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
-            checkNFCSupport();
+        function hidePermissionRequest() {
+            document.getElementById('permissionOverlay').classList.add('hidden');
         }
 
-        // Обновленная функция инициализации NFC
-        async function startNFCScanning() {
-            // Показываем диагностику
-            checkNFCSupport();
+        function showManualInstructions() {
+            document.getElementById('manualInstructions').classList.remove('hidden');
+        }
+
+        function hideManualInstructions() {
+            document.getElementById('manualInstructions').classList.add('hidden');
+        }
+
+        // Основной запрос разрешения NFC
+        async function requestNFCPermission() {
+            updateStatus('Запрашиваю доступ к NFC...');
             
             if (!('NDEFReader' in window)) {
-                showError('NFC не поддерживается вашим браузером. Используйте Chrome для Android.');
+                updateStatus('NFC не поддерживается вашим браузером');
+                showError('Используйте Chrome для Android версии 89+');
                 return;
             }
 
-            // Проверяем разрешения
-            if ('permissions' in navigator) {
-                try {
-                    const permissionStatus = await navigator.permissions.query({ name: 'nfc' });
-                    console.log('NFC permission status:', permissionStatus.state);
-                    
-                    permissionStatus.onchange = () => {
-                        console.log('NFC permission changed to:', permissionStatus.state);
-                    };
-                } catch (error) {
-                    console.log('Permissions API not fully supported');
-                }
-            }
-
             try {
-                updateStatus('Запрашиваю доступ к NFC...');
+                // Создаем экземпляр NFC Reader
+                nfcReader = new NDEFReader();
                 
-                const nfcReader = new NDEFReader();
+                // Пытаемся запустить сканирование - это запросит разрешение
+                updateStatus('Запрос разрешения...');
                 
-                // Попытка сканирования с таймаутом
-                const scanPromise = nfcReader.scan();
-                const timeoutPromise = new Promise((_, reject) => {
-                    setTimeout(() => reject(new Error('NFC timeout')), 5000);
-                });
+                await nfcReader.scan();
                 
-                await Promise.race([scanPromise, timeoutPromise]);
+                // Если дошли сюда - разрешение получено
+                hidePermissionRequest();
+                updateStatus('Доступ получен! Поднесите телефон к NFC метке...');
                 
-                nfcReader.onreading = (event) => {
-                    console.log('NFC tag read:', event);
-                    if (!paymentCompleted) {
-                        updateStatus('Метка считана, обрабатываю оплату...');
-                        setTimeout(completePayment, 1000);
-                    }
-                };
-
-                nfcReader.onreadingerror = (error) => {
-                    console.error('NFC read error:', error);
-                    updateStatus('Ошибка чтения. Поднесите метку ближе.');
-                };
-
-                updateStatus('Готов к сканированию NFC! Поднесите метку.');
-
+                // Показываем анимацию сканирования
+                document.getElementById('scanningAnimation').classList.remove('hidden');
+                document.getElementById('loader').classList.remove('hidden');
+                
+                // Настраиваем обработчики
+                setupNFCHandlers();
+                
             } catch (error) {
-                console.error('NFC init error:', error);
-                handleNFCError(error);
+                console.error('NFC Permission error:', error);
+                handleNFCPermissionError(error);
             }
         }
 
-        // Запускаем при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(startNFCScanning, 1000);
-        });
+        function setupNFCHandlers() {
+            nfcReader.onreading = (event) => {
+                console.log('NFC tag detected:', event);
+                if (!paymentCompleted) {
+                    updateStatus('Оплата обрабатывается...');
+                    setTimeout(completePayment, 1500);
+                }
+            };
+
+            nfcReader.onreadingerror = (error) => {
+                console.error('NFC read error:', error);
+                updateStatus('Ошибка чтения. Поднесите метку ближе.');
+            };
+        }
+
+        function handleNFCPermissionError(error) {
+            let errorMessage = '';
+            
+            switch(error.name) {
+                case 'NotAllowedError':
+                    errorMessage = 'Доступ к NFC запрещен. Разрешите в настройках Chrome.';
+                    showManualInstructions();
+                    break;
+                case 'NotSupportedError':
+                    errorMessage = 'NFC не поддерживается вашим устройством.';
+                    break;
+                case 'SecurityError':
+                    errorMessage = 'Требуется HTTPS соединение.';
+                    break;
+                default:
+                    errorMessage = `Ошибка: ${error.message}`;
+            }
+            
+            updateStatus(errorMessage);
+            showError(errorMessage);
+        }
+
+        function completePayment() {
+            paymentCompleted = true;
+            updateStatus('Оплачено успешно! ✅');
+            document.getElementById('loader').classList.add('hidden');
+            document.getElementById('scanningAnimation').classList.add('hidden');
+            
+            if (nfcReader) {
+                // Останавливаем сканирование после успешной оплаты
+                nfcReader = null;
+            }
+        }
+
+        function updateStatus(message) {
+            document.getElementById('statusMessage').textContent = message;
+        }
+
+        function showError(message) {
+            // Можно добавить уведомление об ошибке
+            console.error(message);
+        }
+
+        // Дополнительные методы для обхода ограничений
+        function alternativeActivationMethods() {
+            // Метод 1: Активация по тапу на странице
+            document.addEventListener('click', function() {
+                if (!nfcReader && !paymentCompleted) {
+                    requestNFCPermission();
+                }
+            });
+            
+            // Метод 2: Активация при фокусе на странице
+            document.addEventListener('touchstart', function() {
+                if (!nfcReader && !paymentCompleted) {
+                    setTimeout(requestNFCPermission, 100);
+                }
+            });
+        }
+        
+        // Запускаем альтернативные методы
+        alternativeActivationMethods();
     </script>
 </body>
 </html>
